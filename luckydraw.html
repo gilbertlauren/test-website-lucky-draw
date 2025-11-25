@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
-    <script type="text/javascript"
-        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
-</script>
-<script type="text/javascript">
-   (function(){
-      // GANTI DENGAN PUBLIC KEY ANDA
-      emailjs.init("6FIwWnQIhV3kwtxas");
-   })();
-</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diskon Spin Wheel</title>
+
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
+    </script>
+    <script type="text/javascript">
+       (function(){
+          // Inisialisasi Public Key
+          emailjs.init("6FIwWnQIhV3kwtxas");
+       })();
+    </script>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -189,9 +191,6 @@
         btn.disabled = true;
         btn.innerText = "Sedang Mengundi...";
         
-        // Bunyi (Opsional - Browser mungkin memblokir auto-audio)
-        // const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'); 
-
         // Tunggu 4 Detik (Sesuai durasi CSS)
         setTimeout(() => {
             hasSpun = true;
@@ -202,30 +201,34 @@
             const winningIndex = Math.floor((360 - actualDeg) / segmentAngle) % segments.length;
             const winningPrize = segments[winningIndex];
 
-            // Tampilkan Hasil
+            // Tampilkan Hasil di Layar
             resultDiv.style.display = "block";
             resultDiv.className = "win-anim";
             resultDiv.innerHTML = `🎉 SELAMAT!<br>Kode Diskon <b>${winningPrize}</b> telah dikirim ke:<br><small>${email}</small>`;
             
             btn.innerText = "Klaim Diskon";
             
-            // SIMULASI NOTIFIKASI
-            // (Nantinya diganti dengan EmailJS)
-            const serviceID = 'service_xkqsdbp';
-const templateID = 'service_xkqsdbp';
+            // --- KIRIM NOTIFIKASI KE EMAIL ADMIN ---
+            
+            // Pastikan templateID di bawah ini benar (biasanya berawalan template_...)
+            // Jika ID-nya memang sama persis dengan serviceID, biarkan saja.
+            const serviceID = 'service_xkqsdbp'; 
+            const templateID = 'service_xkqsdbp'; // <--- CEK INI, APAKAH BENAR SAMA?
 
-const templateParams = {
-    to_name: "Admin",             // Sesuaikan dengan variabel di template EmailJS
-    from_email: email,            // Email user yang main spin
-    prize: winningPrize           // Hadiah yang didapat
-};
+            const templateParams = {
+                to_name: "Admin",             // Variabel di template EmailJS
+                from_email: email,            // Email user
+                prize: winningPrize           // Hadiah diskon
+            };
 
-emailjs.send(serviceID, templateID, templateParams)
-    .then(function() {
-        alert('Notifikasi terkirim ke Admin!');
-    }, function(error) {
-        alert('Gagal mengirim notifikasi: ' + JSON.stringify(error));
-    });
+            emailjs.send(serviceID, templateID, templateParams)
+                .then(function() {
+                    console.log('Sukses mengirim email!');
+                    alert('Notifikasi pemenang telah dikirim ke Admin!');
+                }, function(error) {
+                    console.log('Gagal mengirim email...', error);
+                    alert('Gagal mengirim notifikasi. Cek console log.');
+                });
 
         }, 4000);
     }

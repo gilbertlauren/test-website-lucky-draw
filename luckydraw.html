@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
+</script>
+<script type="text/javascript">
+   (function(){
+      // GANTI DENGAN PUBLIC KEY ANDA
+      emailjs.init("6FIwWnQIhV3kwtxas");
+   })();
+</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -202,7 +211,21 @@
             
             // SIMULASI NOTIFIKASI
             // (Nantinya diganti dengan EmailJS)
-            alert(`[SISTEM] Notifikasi Baru!\nUser: ${email}\nHadiah: Diskon ${winningPrize}\n\n(Data ini akan masuk ke email Anda)`);
+            const serviceID = 'service_xkqsdbp';
+const templateID = 'service_xkqsdbp';
+
+const templateParams = {
+    to_name: "Admin",             // Sesuaikan dengan variabel di template EmailJS
+    from_email: email,            // Email user yang main spin
+    prize: winningPrize           // Hadiah yang didapat
+};
+
+emailjs.send(serviceID, templateID, templateParams)
+    .then(function() {
+        alert('Notifikasi terkirim ke Admin!');
+    }, function(error) {
+        alert('Gagal mengirim notifikasi: ' + JSON.stringify(error));
+    });
 
         }, 4000);
     }

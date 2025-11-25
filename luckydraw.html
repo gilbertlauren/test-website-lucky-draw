@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diskon Spin Wheel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h2 { color: #333; margin-bottom: 5px; }
+        p { color: #666; margin-bottom: 20px; }
+
+        input[type="email"] {
+            padding: 12px;
+            width: 80%;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 25px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid #333;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            background: conic-gradient(
+                #FF5733 0deg 60deg, 
+                #33FF57 60deg 120deg, 
+                #3357FF 120deg 180deg, 
+                #F333FF 180deg 240deg, 
+                #FF33A8 240deg 300deg, 
+                #FFC300 300deg 360deg
+            );
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Panah Penunjuk */
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #333;
+            z-index: 10;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
+
+        /* Titik tengah roda agar terlihat lebih bagus */
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            border: 5px solid #333;
+            z-index: 5;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button:hover { background-color: #218838; transform: scale(1.05); }
+        button:disabled { background-color: #ccc; cursor: not-allowed; transform: none; }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+            display: none; /* Sembunyikan dulu */
+        }
+        .win-anim {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🎡 Lucky Discount</h2>
+    <p>Masukkan email & coba keberuntunganmu!</p>
+    
+    <input type="email" id="userEmail" placeholder="Masukkan email kamu..." required>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <div class="wheel" id="wheel">
+            <div class="center-dot"></div>
+        </div>
+    </div>
+
+    <button id="spinBtn" onclick="spinWheel()">PUTAR RODA</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    // Hadiah (Urutan Berlawanan Arah Jarum Jam)
+    const segments = ["5%", "6%", "7%", "8%", "9%", "10%"];
+    let hasSpun = false;
+
+    function spinWheel() {
+        const email = document.getElementById('userEmail').value;
+        const wheel = document.getElementById('wheel');
+        const resultDiv = document.getElementById('result');
+        const btn = document.getElementById('spinBtn');
+
+        // Validasi Email Sederhana
+        if(email.length < 5 || !email.includes("@")) {
+            alert("⚠️ Harap masukkan email yang valid!");
+            return;
+        }
+
+        if (hasSpun) {
+            alert("⛔ Anda sudah mengambil kesempatan diskon!");
+            return;
+        }
+
+        // Hitung Putaran (Minimal 5x putaran = 1800 derajat)
+        const randomDegree = Math.floor(Math.random() * 360); 
+        const totalSpin = 1800 + randomDegree; 
+
+        // Mulai Animasi
+        wheel.style.transform = `rotate(${totalSpin}deg)`;
+        btn.disabled = true;
+        btn.innerText = "Sedang Mengundi...";
+        
+        // Bunyi (Opsional - Browser mungkin memblokir auto-audio)
+        // const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'); 
+
+        // Tunggu 4 Detik (Sesuai durasi CSS)
+        setTimeout(() => {
+            hasSpun = true;
+            
+            // Hitung Segmen Pemenang
+            const actualDeg = totalSpin % 360;
+            const segmentAngle = 360 / segments.length;
+            const winningIndex = Math.floor((360 - actualDeg) / segmentAngle) % segments.length;
+            const winningPrize = segments[winningIndex];
+
+            // Tampilkan Hasil
+            resultDiv.style.display = "block";
+            resultDiv.className = "win-anim";
+            resultDiv.innerHTML = `🎉 SELAMAT!<br>Kode Diskon <b>${winningPrize}</b> telah dikirim ke:<br><small>${email}</small>`;
+            
+            btn.innerText = "Klaim Diskon";
+            
+            // SIMULASI NOTIFIKASI
+            // (Nantinya diganti dengan EmailJS)
+            alert(`[SISTEM] Notifikasi Baru!\nUser: ${email}\nHadiah: Diskon ${winningPrize}\n\n(Data ini akan masuk ke email Anda)`);
+
+        }, 4000);
+    }
+</script>
+
+</body>
+</html>

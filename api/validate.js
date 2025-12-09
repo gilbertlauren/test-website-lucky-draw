@@ -1,11 +1,11 @@
-// api/validate.js
+// api/seed.js dan api/validate.js
 
 import { createClient } from '@vercel/kv';
 
-// Konfigurasi koneksi menggunakan variabel lingkungan REST API
 const kv = createClient({
-  url: process.env.STORAGE_REST_API_URL, 
-  token: process.env.STORAGE_REST_API_TOKEN,
+  // Gunakan variabel URL penuh yang kamu temukan sebelumnya
+  url: process.env.STORAGE_REDIS_URL, 
+  // Hapus baris 'token' sepenuhnya
 });
 
 export default async function handler(request, response) {

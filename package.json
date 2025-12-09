@@ -1,8 +1,5 @@
 {
-  "name": "lucky-draw-db",
-  "version": "1.0.0",
-  "type": "module",
   "dependencies": {
-    "@vercel/kv": "^1.0.1"
+    "pg": "^8.x.x"
   }
 }

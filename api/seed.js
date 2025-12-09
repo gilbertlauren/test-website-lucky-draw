@@ -1,15 +1,15 @@
-// api/seed.js dan api/validate.js
+// api/seed.js
 
 import { createClient } from '@vercel/kv';
 
+// Konfigurasi koneksi menggunakan variabel lingkungan REST API (yang sempat berhasil)
 const kv = createClient({
-  url: process.env.STORAGE_REDIS_URL, // Gunakan URL penuh yang kamu temukan
-  // Hapus baris 'token' sepenuhnya
-}); 
-
+  url: process.env.STORAGE_REST_API_URL, 
+  token: process.env.STORAGE_REST_API_TOKEN,
+});
 
 export default async function handler(request, response) {
-  // DAFTAR 100 KODE UNIK (LENGKAP)
+  // DAFTAR 100 KODE UNIK LENGKAP
   const codes = [
     "7X9K2M4P", "B3L8Q1W9", "N5R2J7X4", "H9C6D3F8", "K1P4M7T2", "Q8W3Y5L9", "Z2X6C9V4", "J7B3N1M5", "D4F8G2H6", "T9R5E1W3",
     "L6K2J9H4", "M3N8B5V7", "C1X4Z7Q2", "P9O3I6U8", "Y2T5R1E4", "W7Q9A3S6", "G4F2D8H1", "V5C9X3Z7", "B1N6M2K8", "J9H4G7F3",
@@ -25,16 +25,14 @@ export default async function handler(request, response) {
 
   try {
     for (const code of codes) {
-      // Cek apakah kode sudah ada di database
       const exists = await kv.get(`code:${code}`);
       
-      // Jika belum ada, masukkan dengan status 'UNUSED'
       if (!exists) {
         await kv.set(`code:${code}`, 'UNUSED'); 
       }
     }
     return response.status(200).json({ message: "Database berhasil diisi 100 kode!" });
   } catch (error) {
-    return response.status(500).json({ error: error.message, detail: "Koneksi KV gagal. Periksa log Vercel." });
+    return response.status(500).json({ error: "fetch failed", detail: "Koneksi KV gagal. Periksa log Vercel." });
   }
 }

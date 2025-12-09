@@ -19,33 +19,32 @@ const codes = [
 
 export default async function handler(request, response) {
   
-  // KONEKSI DIBUAT PER INVOCATION (PENTING UNTUK SERVERLESS)
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
-    // SSL diatur ke true untuk Neon/Vercel (default di pg jika string ada https)
     ssl: { rejectUnauthorized: false } 
   });
 
   try {
     await client.connect(); // Hubungkan ke Neon
 
+    let insertedCount = 0;
+    
     for (const code of codes) {
-      // Periksa apakah kode sudah ada di tabel
-      const checkRes = await client.query(
-        'SELECT code FROM validation_codes WHERE code = $1', // Query SQL
-        [code]
+      // Menggunakan ON CONFLICT DO NOTHING untuk menghindari error Primary Key
+      const result = await client.query(
+        'INSERT INTO validation_codes (code, status) VALUES ($1, $2) ON CONFLICT (code) DO NOTHING RETURNING code',
+        [code, 'UNUSED']
       );
-
-      if (checkRes.rows.length === 0) {
-        // Jika belum ada, masukkan (INSERT) kode dan status 'UNUSED'
-        await client.query(
-          'INSERT INTO validation_codes (code, status) VALUES ($1, $2) ON CONFLICT (code) DO NOTHING',
-          [code, 'UNUSED']
-        );
+      
+      // Hitung baris yang benar-benar dimasukkan
+      if (result.rows.length > 0) {
+          insertedCount++;
       }
     }
     
-    return response.status(200).json({ message: "Database Neon berhasil diisi 100 kode!" });
+    return response.status(200).json({ 
+        message: `Database Neon berhasil diisi. ${insertedCount} kode unik dimasukkan (atau diperbarui).` 
+    });
     
   } catch (error) {
     console.error("Database Error:", error);

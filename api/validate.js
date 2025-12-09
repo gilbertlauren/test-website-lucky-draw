@@ -7,8 +7,21 @@ export default async function handler(request, response) {
     return response.status(405).send({ message: 'Only POST requests allowed' });
   }
 
-  const { code, email } = request.body;
+  // --- PERBAIKAN PARSING BODY KRUSIAL ---
+  let body = request.body;
 
+  // Jika body belum diurai (berupa string JSON), urai secara manual
+  if (typeof body === 'string') {
+      try {
+          body = JSON.parse(body);
+      } catch (e) {
+          return response.status(400).json({ error: 'Body request tidak valid (bukan JSON).' });
+      }
+  }
+  // ----------------------------------------
+  
+  const { code, email } = body; // Menggunakan variabel 'body' yang sudah terurai
+  
   if (!code || !email) {
     return response.status(400).json({ error: 'Kode dan Email diperlukan.' });
   }
@@ -23,7 +36,7 @@ export default async function handler(request, response) {
 
     // 1. Cek keberadaan dan status kode (SELECT)
     const checkRes = await client.query(
-      'SELECT status FROM validation_codes WHERE code = $1', // Query SQL
+      'SELECT status FROM validation_codes WHERE code = $1',
       [code]
     );
 
@@ -53,6 +66,7 @@ export default async function handler(request, response) {
 
   } catch (error) {
     console.error("Database Error:", error);
+    // Tambahkan error.message untuk debugging yang lebih baik di log Vercel
     return response.status(500).json({ error: 'Terjadi kesalahan server saat memproses validasi.', detail: error.message });
   } finally {
     if (client) {

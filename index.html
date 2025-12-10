@@ -474,11 +474,11 @@
 
     <script>
         const weightedSegments = [
-            { prize: "DISKON 10%", weight: 1 },
-            { prize: "Rp. 7.000", weight: 3 }, // Lebih susah didapat (16.67%)
-            { prize: "Rp. 5.000", weight: 5 }, // Lebih mudah didapat (27.78%)
-            { prize: "Rp. 10.000", weight: 2 },
-            { prize: "Rp. 2.000", weight: 7 }
+            { prize: "DISKON 10%", weight: 2 }, // 9.52%
+            { prize: "Rp. 7.000", weight: 4 }, // 19.05%
+            { prize: "Rp. 5.000", weight: 6 }, // 28.57%
+            { prize: "Rp. 10.000", weight: 3 }, // 14.29%
+            { prize: "Rp. 2.000", weight: 6 } // 28.57% (turun dari 34.78%)
         ];
         // Pastikan urutan di sini sesuai dengan urutan di HTML/CSS (walaupun tidak digunakan untuk tampilan, penting untuk konsistensi)
         const segments = weightedSegments.map(s => s.prize);

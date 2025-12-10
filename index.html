@@ -475,8 +475,8 @@
     <script>
         const weightedSegments = [
             { prize: "DISKON 10%", weight: 1 },
-            { prize: "Rp. 7.000", weight: 5 }, // Sesuaikan bobot dengan urutan baru
-            { prize: "Rp. 5.000", weight: 3 },
+            { prize: "Rp. 7.000", weight: 3 }, // Lebih susah didapat (16.67%)
+            { prize: "Rp. 5.000", weight: 5 }, // Lebih mudah didapat (27.78%)
             { prize: "Rp. 10.000", weight: 2 },
             { prize: "Rp. 2.000", weight: 7 }
         ];
@@ -523,7 +523,9 @@
                 const data = await response.json();
 
                 if (!data.success) {
-                    alert(data.message);
+                    // Tampilkan pesan error dari API (bisa berupa data.message atau data.error)
+                    const errorMessage = data.message || data.error || 'Terjadi kesalahan validasi.';
+                    alert(errorMessage);
                     btn.disabled = false;
                     btn.innerText = "PUTAR SEKARANG!";
                     return;

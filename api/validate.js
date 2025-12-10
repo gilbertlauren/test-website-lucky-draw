@@ -1,6 +1,6 @@
 // api/validate.js
 
-import { Client } from 'pg'; 
+import { Client } from 'pg';
 
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
@@ -12,20 +12,20 @@ export default async function handler(request, response) {
 
   // Jika body belum diurai (berupa string JSON), urai secara manual
   if (typeof body === 'string') {
-      try {
-          body = JSON.parse(body);
-      } catch (e) {
-          return response.status(400).json({ error: 'Body request tidak valid (bukan JSON).' });
-      }
+    try {
+      body = JSON.parse(body);
+    } catch (e) {
+      return response.status(400).json({ success: false, message: 'Body request tidak valid (bukan JSON).' });
+    }
   }
   // ----------------------------------------
-  
+
   const { code, email } = body; // Menggunakan variabel 'body' yang sudah terurai
-  
+
   if (!code || !email) {
-    return response.status(400).json({ error: 'Kode dan Email diperlukan.' });
+    return response.status(400).json({ success: false, message: 'Kode dan Email diperlukan.' });
   }
-  
+
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
@@ -42,14 +42,17 @@ export default async function handler(request, response) {
 
     if (checkRes.rows.length === 0) {
       // Kode tidak ditemukan
-      return response.status(404).json({ error: 'Kode tidak valid atau tidak ditemukan.' });
+      return response.status(404).json({ success: false, message: 'Kode tidak valid atau tidak ditemukan.' });
     }
 
     const codeStatus = checkRes.rows[0].status;
 
     if (codeStatus !== 'UNUSED') {
       // Kode sudah digunakan
-      return response.status(409).json({ error: `Kode sudah digunakan oleh ${codeStatus}.` });
+      return response.status(409).json({
+        success: false,
+        message: 'Kode unik sudah pernah digunakan. Setiap kode hanya dapat digunakan sekali.'
+      });
     }
 
     // 2. Jika kode UNUSED, perbarui status menjadi email pengguna (UPDATE)
@@ -59,15 +62,15 @@ export default async function handler(request, response) {
     );
 
     // 3. Kirim respon sukses
-    return response.status(200).json({ 
-        message: 'Validasi berhasil! Kode valid dan telah digunakan.', 
-        success: true 
+    return response.status(200).json({
+      message: 'Validasi berhasil! Kode valid dan telah digunakan.',
+      success: true
     });
 
   } catch (error) {
     console.error("Database Error:", error);
     // Tambahkan error.message untuk debugging yang lebih baik di log Vercel
-    return response.status(500).json({ error: 'Terjadi kesalahan server saat memproses validasi.', detail: error.message });
+    return response.status(500).json({ success: false, message: 'Terjadi kesalahan server saat memproses validasi.', detail: error.message });
   } finally {
     if (client) {
       await client.end(); // Tutup koneksi

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Lucky Draw - 10x Pengambilan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #131325;
+            --accent-yellow: #ffc107;
+            --monster-pink: #ff6b81;
+            --monster-green: #7bed9f;
+            --monster-blue: #70a1ff;
+            --monster-purple: #a55eea;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(var(--accent-yellow) 2px, transparent 2px),
+                radial-gradient(var(--monster-purple) 2px, transparent 2px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 100%;
+            border: 8px solid var(--accent-yellow);
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            color: #333;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .info-box h3 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--accent-yellow);
+            margin-top: 0;
+        }
+
+        .probability-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .probability-table th,
+        .probability-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .probability-table th {
+            background: rgba(255, 255, 255, 0.2);
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .highlight-row {
+            background: rgba(255, 193, 7, 0.2);
+            font-weight: 900;
+        }
+
+        button {
+            background: var(--bg-dark);
+            color: var(--accent-yellow);
+            border: none;
+            padding: 18px 45px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #000;
+            transition: 0.2s;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #000;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #000;
+        }
+
+        .results-container {
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+        }
+
+        .draw-result {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 15px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .draw-number {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 50%;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .draw-prize {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.3rem;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+            color: white;
+        }
+
+        .summary h3 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--accent-yellow);
+            margin-top: 0;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .summary-item .count {
+            background: var(--accent-yellow);
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .chart-container {
+            margin-top: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .chart-bar {
+            margin: 10px 0;
+        }
+
+        .chart-label {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .bar {
+            height: 30px;
+            background: linear-gradient(90deg, var(--accent-yellow), #ff9f43);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-family: 'Fredoka One', cursive;
+            color: #333;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎰 Simulasi Lucky Draw</h1>
+        <h2 style="text-align: center; color: #666; font-size: 1.2rem; margin-top: -10px;">10x Pengambilan Draw</h2>
+
+        <div class="info-box">
+            <h3>📊 Peluang Masing-Masing Hadiah (UPDATED)</h3>
+            <table class="probability-table">
+                <thead>
+                    <tr>
+                        <th>Hadiah</th>
+                        <th>Bobot</th>
+                        <th>Peluang</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DISKON 10%</td>
+                        <td>1</td>
+                        <td>5.56% (1/18)</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>Rp. 7.000 ⬇️</td>
+                        <td>3</td>
+                        <td>16.67% (3/18) - Lebih Susah</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>Rp. 5.000 ⬆️</td>
+                        <td>5</td>
+                        <td>27.78% (5/18) - Lebih Mudah</td>
+                    </tr>
+                    <tr>
+                        <td>Rp. 10.000</td>
+                        <td>2</td>
+                        <td>11.11% (2/18)</td>
+                    </tr>
+                    <tr>
+                        <td>Rp. 2.000</td>
+                        <td>7</td>
+                        <td>38.89% (7/18)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-bottom: 0; font-size: 0.9rem; opacity: 0.9;">
+                <strong>Total Bobot:</strong> 18 |
+                <strong>Hadiah Paling Sering:</strong> Rp. 2.000 (38.89%) |
+                <strong>Hadiah Paling Jarang:</strong> DISKON 10% (5.56%)
+            </p>
+            <p
+                style="margin-top: 10px; margin-bottom: 0; font-size: 0.85rem; background: rgba(255,193,7,0.3); padding: 10px; border-radius: 8px;">
+                ⚠️ <strong>Perubahan:</strong> Rp. 7.000 sekarang lebih susah didapat (16.67%) dibanding Rp. 5.000
+                (27.78%)
+            </p>
+        </div>
+
+        <button onclick="runSimulation()">🎲 JALANKAN SIMULASI 10x</button>
+
+        <div class="results-container" id="resultsContainer">
+            <h3 style="font-family: 'Fredoka One', cursive; color: #333; text-align: center;">
+                Hasil Pengambilan:
+            </h3>
+            <div id="drawResults"></div>
+
+            <div class="summary">
+                <h3>📈 Ringkasan Hasil</h3>
+                <div id="summaryContent"></div>
+                <div class="chart-container">
+                    <div style="font-family: 'Fredoka One', cursive; margin-bottom: 15px; font-size: 1.1rem;">
+                        Visualisasi Distribusi:
+                    </div>
+                    <div id="chartContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BOBOT SUDAH DIUPDATE: Rp. 7.000 lebih susah (3), Rp. 5.000 lebih mudah (5)
+        const weightedSegments = [
+            { prize: "DISKON 10%", weight: 1 },
+            { prize: "Rp. 7.000", weight: 3 }, // Lebih susah didapat (16.67%)
+            { prize: "Rp. 5.000", weight: 5 }, // Lebih mudah didapat (27.78%)
+            { prize: "Rp. 10.000", weight: 2 },
+            { prize: "Rp. 2.000", weight: 7 }
+        ];
+
+        function getWeightedRandomSegment() {
+            let totalWeight = weightedSegments.reduce((sum, item) => sum + item.weight, 0);
+            let randomNum = Math.random() * totalWeight;
+            let weightSum = 0;
+
+            for (let i = 0; i < weightedSegments.length; i++) {
+                weightSum += weightedSegments[i].weight;
+                if (randomNum <= weightSum) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+
+        function runSimulation() {
+            const drawResultsDiv = document.getElementById('drawResults');
+            const summaryDiv = document.getElementById('summaryContent');
+            const chartDiv = document.getElementById('chartContent');
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            // Reset
+            drawResultsDiv.innerHTML = '';
+            summaryDiv.innerHTML = '';
+            chartDiv.innerHTML = '';
+
+            // Jalankan 10x draw
+            const results = [];
+            const counts = {};
+
+            // Initialize counts
+            weightedSegments.forEach(segment => {
+                counts[segment.prize] = 0;
+            });
+
+            // Run simulation
+            for (let i = 1; i <= 10; i++) {
+                const segmentIndex = getWeightedRandomSegment();
+                const prize = weightedSegments[segmentIndex].prize;
+                results.push({ draw: i, prize: prize });
+                counts[prize]++;
+
+                // Add to display with delay for animation
+                setTimeout(() => {
+                    const drawDiv = document.createElement('div');
+                    drawDiv.className = 'draw-result';
+                    drawDiv.innerHTML = `
+                        <div class="draw-number">#${i}</div>
+                        <div class="draw-prize">${prize}</div>
+                    `;
+                    drawResultsDiv.appendChild(drawDiv);
+
+                    // Show summary after last draw
+                    if (i === 10) {
+                        setTimeout(() => {
+                            displaySummary(counts);
+                        }, 300);
+                    }
+                }, i * 200);
+            }
+
+            // Show results container
+            resultsContainer.classList.add('show');
+        }
+
+        function displaySummary(counts) {
+            const summaryDiv = document.getElementById('summaryContent');
+            const chartDiv = document.getElementById('chartContent');
+
+            // Display counts
+            weightedSegments.forEach(segment => {
+                const count = counts[segment.prize];
+                const percentage = (count / 10 * 100).toFixed(1);
+
+                const summaryItem = document.createElement('div');
+                summaryItem.className = 'summary-item';
+                summaryItem.innerHTML = `
+                    <span>${segment.prize}</span>
+                    <span class="count">${count}x (${percentage}%)</span>
+                `;
+                summaryDiv.appendChild(summaryItem);
+
+                // Create chart bar
+                const chartBar = document.createElement('div');
+                chartBar.className = 'chart-bar';
+                chartBar.innerHTML = `
+                    <div class="chart-label">${segment.prize}</div>
+                    <div class="bar" style="width: ${count * 10}%">${count}x</div>
+                `;
+                chartDiv.appendChild(chartBar);
+            });
+
+            // Add comparison with expected values
+            const comparisonDiv = document.createElement('div');
+            comparisonDiv.style.marginTop = '1.5rem';
+            comparisonDiv.style.padding = '1rem';
+            comparisonDiv.style.background = 'rgba(255, 255, 255, 0.1)';
+            comparisonDiv.style.borderRadius = '10px';
+            comparisonDiv.innerHTML = `
+                <div style="font-family: 'Fredoka One', cursive; margin-bottom: 10px; font-size: 1.1rem;">
+                    💡 Perbandingan dengan Ekspektasi:
+                </div>
+                <div style="font-size: 0.9rem; line-height: 1.8;">
+                    <strong>Catatan:</strong> Dalam 10x draw, secara statistik diharapkan:<br>
+                    • DISKON 10%: ~0.6x (Anda dapat: ${counts["DISKON 10%"]}x)<br>
+                    • Rp. 7.000: ~1.7x (Anda dapat: ${counts["Rp. 7.000"]}x) ⬇️ Lebih Susah<br>
+                    • Rp. 5.000: ~2.8x (Anda dapat: ${counts["Rp. 5.000"]}x) ⬆️ Lebih Mudah<br>
+                    • Rp. 10.000: ~1.1x (Anda dapat: ${counts["Rp. 10.000"]}x)<br>
+                    • Rp. 2.000: ~3.9x (Anda dapat: ${counts["Rp. 2.000"]}x)
+                </div>
+            `;
+            summaryDiv.appendChild(comparisonDiv);
+        }
+    </script>
+</body>
+
+</html>

@@ -561,8 +561,18 @@
                         }, 500);
                     }
 
-                    emailjs.send('service_xkqsdbp', 'template_m8raygp', {
-                        from_email: email, prize: winningPrize, unique_code: codeInput
+                    // Pilih template email berdasarkan jenis hadiah
+                    let templateId;
+                    if (winningPrize === "DISKON 10%") {
+                        templateId = 'template_discount10'; // Template khusus untuk diskon 10%
+                    } else {
+                        templateId = 'template_voucher'; // Template untuk voucher nominal
+                    }
+
+                    emailjs.send('service_xkqsdbp', templateId, {
+                        from_email: email,
+                        prize: winningPrize,
+                        unique_code: codeInput
                     });
                 }, 4500);
 

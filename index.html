@@ -569,11 +569,23 @@
                         templateId = 'template_voucher'; // Template untuk voucher nominal
                     }
 
+                    // Kirim email dengan error handling
+                    console.log('Mengirim email ke:', email);
+                    console.log('Template ID:', templateId);
+                    console.log('Prize:', winningPrize);
+
                     emailjs.send('service_xkqsdbp', templateId, {
-                        from_email: email,
+                        to_email: email,
                         prize: winningPrize,
                         unique_code: codeInput
-                    });
+                    })
+                        .then(function (response) {
+                            console.log('✅ Email berhasil dikirim!', response.status, response.text);
+                        })
+                        .catch(function (error) {
+                            console.error('❌ Gagal mengirim email:', error);
+                            alert('⚠️ Hadiah Anda sudah dicatat, tetapi email gagal dikirim. Silakan hubungi admin dengan kode: ' + codeInput);
+                        });
                 }, 4500);
 
             } catch (error) {

@@ -438,12 +438,11 @@
     <div class="cookie-deco c4"></div>
     <div class="container">
         <div class="hello-box">hello,</div>
-        <h1 class="main-title">FEFEFOO.BITE<br>LUCKY DRAW</h1>
-        <p class="author">by Sonya Chintya Dewi</p>
+        <h1 class="main-title">LUCKY DRAW</h1>
+        <p class="author">by fefefoo.bite</p>
         <p class="subtitle">Masukkan Email & Kode Unik!</p>
         <input type="email" id="userEmail" placeholder="Contoh: nama@email.com" required>
-        <input type="text" id="accessCode" placeholder="Masukkan Kode (8 Digit)" required maxlength="8"
-            style="text-transform: uppercase;">
+        <input type="text" id="accessCode" placeholder="Masukkan kode (8 digit)" required maxlength="8">
         <div class="wheel-container">
             <div class="wheel" id="wheel">
                 <span class="wheel-label" style="--i:0;">DISKON 10%</span>
@@ -599,6 +598,11 @@
         function closeModal() {
             document.getElementById('discountModal').classList.remove('show');
         }
+
+        // Auto uppercase untuk input kode tanpa mempengaruhi placeholder
+        document.getElementById('accessCode').addEventListener('input', function (e) {
+            this.value = this.value.toUpperCase();
+        });
     </script>
 </body>
 
